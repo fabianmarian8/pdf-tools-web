@@ -20,7 +20,7 @@ export default function MergePage() {
       return;
     }
 
-    setIsProcessing(isProcessing);
+    setIsProcessing(true);
 
     try {
       const mergedPdf = await PDFDocument.create();
@@ -33,7 +33,8 @@ export default function MergePage() {
       }
 
       const mergedPdfBytes = await mergedPdf.save();
-      const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+      const byteArray = Uint8Array.from(mergedPdfBytes);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       
       const link = document.createElement('a');
