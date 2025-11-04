@@ -28,16 +28,15 @@ export default function Home() {
           </Link>
 
           {/* Split PDF */}
-          <Link href="/#" className="block">
-            <div className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer opacity-60">
+          <Link href="/split" className="block">
+            <div className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
               <h3 className="text-xl font-semibold mb-2">Rozdeliť PDF</h3>
-              <p className="text-gray-600">Rozdeľte PDF na samostatné stránky alebo extrahujte špecifické stránky</p>
-              <span className="text-xs text-gray-400 mt-2 block">Čoskoro</span>
+              <p className="text-gray-600">Rozdeľte PDF na samostatné stránky</p>
             </div>
           </Link>
 
