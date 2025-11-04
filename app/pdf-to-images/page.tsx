@@ -1,12 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import * as pdfjsLib from 'pdfjs-dist';
 import Link from 'next/link';
 
-// Nastavenie worker path pre pdfjs
+// Dynamic import pre pdfjs-dist aby sa načítal len v browseri
+let pdfjsLib: any = null;
+
 if (typeof window !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+  import('pdfjs-dist').then((pdfjs) => {
+    pdfjsLib = pdfjs;
+    pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+  });
 }
 
 type ImageFormat = 'png' | 'jpeg';
@@ -31,6 +35,11 @@ export default function PdfToImagesPage() {
   const convertToImages = async () => {
     if (!file) {
       alert('Prosím nahrajte PDF súbor');
+      return;
+    }
+
+    if (!pdfjsLib) {
+      alert('PDF knižnica sa ešte načítava, prosím skúste znova o chvíľu');
       return;
     }
 
