@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import AnimatedBackground from '@/components/AnimatedBackground';
 
 // Dynamic import pre pdfjs-dist aby sa načítal len v browseri
 let pdfjsLib: any = null;
@@ -95,8 +96,10 @@ export default function PdfToImagesPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-red-50 to-white">
-      <div className="container mx-auto px-4 py-16">
+    <main className="min-h-screen relative overflow-hidden">
+      <AnimatedBackground />
+      
+      <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="mb-8">
           <Link href="/" className="text-red-600 hover:text-red-800 flex items-center gap-2">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,12 +110,12 @@ export default function PdfToImagesPage() {
         </div>
 
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">PDF do obrázkov</h1>
-          <p className="text-gray-600">Konvertujte stránky PDF na JPG alebo PNG obrázky</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4 drop-shadow-sm">PDF do obrázkov</h1>
+          <p className="text-gray-700">Konvertujte stránky PDF na JPG alebo PNG obrázky</p>
         </div>
 
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20">
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Vyberte PDF súbor
@@ -184,13 +187,13 @@ export default function PdfToImagesPage() {
             <button
               onClick={convertToImages}
               disabled={!file || isProcessing}
-              className="w-full bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-red-600 hover:to-red-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               {isProcessing ? 'Konvertujem...' : 'Konvertovať na obrázky'}
             </button>
           </div>
 
-          <div className="mt-8 bg-red-50 rounded-lg p-6">
+          <div className="mt-8 bg-red-50/80 backdrop-blur-sm rounded-2xl p-6 border border-red-100/50">
             <h3 className="font-semibold text-gray-900 mb-2">Ako to funguje?</h3>
             <ol className="space-y-2 text-sm text-gray-600">
               <li>1. Vyberte PDF súbor</li>

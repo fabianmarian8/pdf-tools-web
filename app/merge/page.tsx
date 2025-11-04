@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { PDFDocument } from 'pdf-lib';
 import Link from 'next/link';
+import AnimatedBackground from '@/components/AnimatedBackground';
 
 export default function MergePage() {
   const [files, setFiles] = useState<File[]>([]);
@@ -52,8 +53,10 @@ export default function MergePage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <div className="container mx-auto px-4 py-16">
+    <main className="min-h-screen relative overflow-hidden">
+      <AnimatedBackground />
+      
+      <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="mb-8">
           <Link href="/" className="text-blue-600 hover:text-blue-800 flex items-center gap-2">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -64,12 +67,12 @@ export default function MergePage() {
         </div>
 
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Spojiť PDF súbory</h1>
-          <p className="text-gray-600">Vyberte viacero PDF súborov a spojte ich do jedného dokumentu</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4 drop-shadow-sm">Spojiť PDF súbory</h1>
+          <p className="text-gray-700">Vyberte viacero PDF súborov a spojte ich do jedného dokumentu</p>
         </div>
 
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20">
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Vyberte PDF súbory (min. 2)
@@ -104,13 +107,13 @@ export default function MergePage() {
             <button
               onClick={mergePDFs}
               disabled={files.length < 2 || isProcessing}
-              className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               {isProcessing ? 'Spájam PDF...' : 'Spojiť PDF súbory'}
             </button>
           </div>
 
-          <div className="mt-8 bg-blue-50 rounded-lg p-6">
+          <div className="mt-8 bg-blue-50/80 backdrop-blur-sm rounded-2xl p-6 border border-blue-100/50">
             <h3 className="font-semibold text-gray-900 mb-2">Ako to funguje?</h3>
             <ol className="space-y-2 text-sm text-gray-600">
               <li>1. Vyberte minimálne 2 PDF súbory</li>

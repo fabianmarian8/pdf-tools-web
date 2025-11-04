@@ -3,6 +3,7 @@
 import { useState, type ChangeEvent } from 'react';
 import Link from 'next/link';
 import { PDFDocument } from 'pdf-lib';
+import AnimatedBackground from '@/components/AnimatedBackground';
 
 export default function ConvertPage() {
   const [files, setFiles] = useState<File[]>([]);
@@ -76,8 +77,10 @@ export default function ConvertPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
-      <div className="container mx-auto px-4 py-16">
+    <main className="min-h-screen relative overflow-hidden">
+      <AnimatedBackground />
+      
+      <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="mb-8">
           <Link href="/" className="text-orange-600 hover:text-orange-800 flex items-center gap-2">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,12 +91,12 @@ export default function ConvertPage() {
         </div>
 
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Konvertovať do PDF</h1>
-          <p className="text-gray-600">Konvertujte JPG a PNG obrázky do PDF formátu</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4 drop-shadow-sm">Konvertovať do PDF</h1>
+          <p className="text-gray-700">Konvertujte JPG a PNG obrázky do PDF formátu</p>
         </div>
 
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20">
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Vyberte obrázky (JPG, PNG)
@@ -133,13 +136,13 @@ export default function ConvertPage() {
             <button
               onClick={convertToPDF}
               disabled={files.length === 0 || isProcessing}
-              className="w-full bg-orange-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               {isProcessing ? 'Konvertujem...' : 'Konvertovať do PDF'}
             </button>
           </div>
 
-          <div className="mt-8 bg-orange-50 rounded-lg p-6">
+          <div className="mt-8 bg-orange-50/80 backdrop-blur-sm rounded-2xl p-6 border border-orange-100/50">
             <h3 className="font-semibold text-gray-900 mb-2">Ako to funguje?</h3>
             <ol className="space-y-2 text-sm text-gray-600">
               <li>1. Vyberte jeden alebo viac obrázkov (JPG alebo PNG)</li>

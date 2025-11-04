@@ -26,3 +26,80 @@
     --radius: 0.5rem;
   }
 }
+
+/* Pomalé 3D animácie pre bubliny */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+@keyframes float-medium {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-40px, 40px) scale(1.15);
+  }
+}
+
+@keyframes float-fast {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(20px, -40px) scale(1.05);
+  }
+  75% {
+    transform: translate(-30px, 30px) scale(0.95);
+  }
+}
+
+@keyframes float-slow-reverse {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-30px, 30px) scale(1.1);
+  }
+  66% {
+    transform: translate(20px, -20px) scale(0.9);
+  }
+}
+
+@keyframes float-medium-reverse {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(40px, -40px) scale(1.15);
+  }
+}
+
+@layer utilities {
+  .animate-float-slow {
+    animation: float-slow 20s ease-in-out infinite;
+  }
+  
+  .animate-float-medium {
+    animation: float-medium 15s ease-in-out infinite;
+  }
+  
+  .animate-float-fast {
+    animation: float-fast 12s ease-in-out infinite;
+  }
+  
+  .animate-float-slow-reverse {
+    animation: float-slow-reverse 18s ease-in-out infinite;
+  }
+  
+  .animate-float-medium-reverse {
+    animation: float-medium-reverse 16s ease-in-out infinite;
+  }
+}
