@@ -1,5 +1,45 @@
+'use client';
+
+import { useState, type ChangeEvent } from 'react';
+import Link from 'next/link';
+import { PDFDocument } from 'pdf-lib';
+
+export default function ConvertPage() {
+  const [files, setFiles] = useState<File[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = event.target.files;
+    if (!selectedFiles) {
+      setFiles([]);
+      return;
+    }
+
+    const validFiles = Array.from(selectedFiles).filter((file) =>
+      ['image/png', 'image/jpeg', 'image/jpg'].includes(file.type),
+    );
+
+    if (validFiles.length !== selectedFiles.length) {
+      alert('Niektoré súbory neboli obrázky vo formáte JPG alebo PNG a neboli pridané.');
+    }
+
+    setFiles(validFiles);
+  };
+
+  const convertToPDF = async () => {
+    if (files.length === 0) {
+      alert('Prosím vyberte aspoň jeden obrázok.');
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const pdfDoc = await PDFDocument.create();
+
+      for (const file of files) {
         const arrayBuffer = await file.arrayBuffer();
-        
+
         let image;
         if (file.type === 'image/png') {
           image = await pdfDoc.embedPng(arrayBuffer);
@@ -20,12 +60,12 @@
       const byteArray = Uint8Array.from(pdfBytes);
       const blob = new Blob([byteArray], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
-      
+
       const link = document.createElement('a');
       link.href = url;
       link.download = 'konvertovane-obrazky.pdf';
       link.click();
-      
+
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Chyba pri konverzii:', error);
@@ -76,7 +116,12 @@
                   {files.map((file, index) => (
                     <li key={index} className="text-sm text-gray-600 flex items-center gap-2">
                       <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
                       </svg>
                       {file.name}
                     </li>
