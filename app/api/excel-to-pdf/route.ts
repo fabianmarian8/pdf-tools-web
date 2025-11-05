@@ -42,6 +42,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Krok 2: Konverzia Excel → PDF s landscape orientáciou
+    const profileSettings = {
+      // Zachovať pôvodné mierky tabuľky a zabrániť zmenšeniu obsahu
+      FitToPage: false,
+      AutoFitColumns: false,
+      AutoFitRows: false,
+      Scale: 100,
+      PageSize: 'A4',
+      Margins: {
+        Top: 10,
+        Bottom: 10,
+        Left: 10,
+        Right: 10,
+      },
+    };
+
     const convertResponse = await fetch('https://api.pdf.co/v1/xls/convert/to/pdf?portrait=false', {
       method: 'POST',
       headers: {
@@ -53,12 +68,7 @@ export async function POST(request: NextRequest) {
         name: fileName.replace(/\.(xlsx|xls|xlsm)$/i, '.pdf'),
         async: false, // Synchronous processing
         // Nastavenia pre lepší výstup
-        profiles: JSON.stringify({
-          AutoFitColumns: true, // Auto-fit šírka stĺpcov
-          AutoFitRows: true, // Auto-fit výška riadkov
-          FitToPage: true, // Prispôsobiť na stranu
-          PageSize: 'A4', // Veľkosť papiera
-        }),
+        profiles: JSON.stringify(profileSettings),
       }),
     });
 
