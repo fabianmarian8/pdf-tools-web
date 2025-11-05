@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Krok 2: Konverzia Excel → PDF
-    const convertResponse = await fetch('https://api.pdf.co/v1/pdf/convert/from/excel', {
+    const convertResponse = await fetch('https://api.pdf.co/v1/xls/convert/to/pdf', {
       method: 'POST',
       headers: {
         'x-api-key': apiKey,
@@ -52,11 +52,6 @@ export async function POST(request: NextRequest) {
         url: uploadResult.url,
         name: fileName.replace(/\.(xlsx|xls|xlsm)$/i, '.pdf'),
         async: false, // Synchronous processing
-        inline: false,
-        encrypt: false,
-        // Nastavenia pre Excel konverziu
-        pages: '', // Všetky listy
-        orientation: 'Portrait', // Možnosti: Portrait, Landscape
       }),
     });
 
