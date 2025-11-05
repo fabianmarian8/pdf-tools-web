@@ -42,14 +42,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Krok 2: Konverzia Excel → PDF s landscape orientáciou
-    const convertResponse = await fetch('https://api.pdf.co/v1/xls/convert/to/pdf', {
+    const convertResponse = await fetch('https://api.pdf.co/v1/xls/convert/to/pdf?portrait=false', {
       method: 'POST',
       headers: {
         'x-api-key': apiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        url: `${uploadResult.url}&portrait=false`, // Landscape orientácia
+        url: uploadResult.url, // Čistá URL bez dodatočných parametrov
         name: fileName.replace(/\.(xlsx|xls|xlsm)$/i, '.pdf'),
         async: false, // Synchronous processing
         // Nastavenia pre lepší výstup
