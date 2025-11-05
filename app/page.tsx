@@ -94,6 +94,45 @@ export default function Home() {
               <p className="text-gray-600">Otočte stránky PDF o 90, 180 alebo 270 stupňov</p>
             </div>
           </Link>
+
+          {/* Organize PDF */}
+          <Link href="/organize" className="block group">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer border border-white/20">
+              <div className="w-14 h-14 bg-gradient-to-br from-teal-400 to-teal-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900">Organizovať PDF</h3>
+              <p className="text-gray-600">Preusporiadajte alebo odstráňte stránky pomocou drag & drop</p>
+            </div>
+          </Link>
+
+          {/* Watermark */}
+          <Link href="/watermark" className="block group">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer border border-white/20">
+              <div className="w-14 h-14 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900">Vodoznak</h3>
+              <p className="text-gray-600">Pridajte textový vodoznak na všetky stránky PDF</p>
+            </div>
+          </Link>
+
+          {/* Sign PDF */}
+          <Link href="/sign" className="block group">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer border border-white/20">
+              <div className="w-14 h-14 bg-gradient-to-br from-pink-400 to-pink-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900">Podpísať PDF</h3>
+              <p className="text-gray-600">Pridajte svoj podpis nakres lením alebo nahratím obrázka</p>
+            </div>
+          </Link>
         </div>
       </div>
     </main>
