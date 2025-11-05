@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       throw new Error(uploadResult.message || 'Chyba pri nahrávaní súboru');
     }
 
-    // Krok 2: Konverzia Excel → PDF
+    // Krok 2: Konverzia Excel → PDF s landscape orientáciou
     const convertResponse = await fetch('https://api.pdf.co/v1/xls/convert/to/pdf', {
       method: 'POST',
       headers: {
@@ -49,9 +49,16 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        url: uploadResult.url,
+        url: `${uploadResult.url}&portrait=false`, // Landscape orientácia
         name: fileName.replace(/\.(xlsx|xls|xlsm)$/i, '.pdf'),
         async: false, // Synchronous processing
+        // Nastavenia pre lepší výstup
+        profiles: JSON.stringify({
+          AutoFitColumns: true, // Auto-fit šírka stĺpcov
+          AutoFitRows: true, // Auto-fit výška riadkov
+          FitToPage: true, // Prispôsobiť na stranu
+          PageSize: 'A4', // Veľkosť papiera
+        }),
       }),
     });
 
