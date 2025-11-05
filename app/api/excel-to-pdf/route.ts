@@ -11,76 +11,132 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // PDF.co API kľúč z environment variables
-    const apiKey = process.env.PDFCO_API_KEY;
+    // CloudConvert API kľúč z environment variables
+    const apiKey = process.env.CLOUDCONVERT_API_KEY;
 
     if (!apiKey) {
-      console.error('PDFCO_API_KEY nie je nastavený v .env.local');
+      console.error('CLOUDCONVERT_API_KEY nie je nastavený v .env.local');
       return NextResponse.json(
         { error: 'Chyba konfigurácie servera' },
         { status: 500 }
       );
     }
 
-    // Krok 1: Upload súboru do PDF.co
-    const uploadResponse = await fetch('https://api.pdf.co/v1/file/upload/base64', {
+    // Zistenie vstupného formátu
+    const inputFormat = fileName.match(/\.(xlsx|xls|xlsm)$/i)?.[1].toLowerCase() || 'xlsx';
+
+    // Krok 1: Vytvorenie jobu s taskmi (import, convert, export)
+    const createJobResponse = await fetch('https://api.cloudconvert.com/v2/jobs', {
       method: 'POST',
       headers: {
-        'x-api-key': apiKey,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name: fileName,
-        file: base64Data,
+        tasks: {
+          'import-my-file': {
+            operation: 'import/upload'
+          },
+          'convert-my-file': {
+            operation: 'convert',
+            input: 'import-my-file',
+            output_format: 'pdf',
+            input_format: inputFormat,
+            // Nastavenia pre lepšiu kvalitu výstupu
+            engine: 'office',
+            engine_version: 'latest',
+            page_orientation: 'landscape',
+            fit_to_page_width: true,
+          },
+          'export-my-file': {
+            operation: 'export/url',
+            input: 'convert-my-file'
+          }
+        }
       }),
     });
 
-    const uploadResult = await uploadResponse.json();
-
-    if (!uploadResult.url) {
-      throw new Error(uploadResult.message || 'Chyba pri nahrávaní súboru');
+    if (!createJobResponse.ok) {
+      const errorData = await createJobResponse.json();
+      throw new Error(errorData.message || 'Chyba pri vytváraní konverznej úlohy');
     }
 
-    // Krok 2: Konverzia Excel → PDF s landscape orientáciou
-    const profileSettings = {
-      // Zachovať pôvodné mierky tabuľky a zabrániť zmenšeniu obsahu
-      FitToPage: false,
-      AutoFitColumns: false,
-      AutoFitRows: false,
-      Scale: 100,
-      PageSize: 'A4',
-      Margins: {
-        Top: 10,
-        Bottom: 10,
-        Left: 10,
-        Right: 10,
-      },
-    };
+    const jobData = await createJobResponse.json();
+    const uploadTask = jobData.data.tasks.find((task: any) => task.name === 'import-my-file');
 
-    const convertResponse = await fetch('https://api.pdf.co/v1/xls/convert/to/pdf?portrait=false', {
+    if (!uploadTask || !uploadTask.result?.form) {
+      throw new Error('Nepodarilo sa získať upload URL');
+    }
+
+    // Krok 2: Upload súboru
+    const formData = new FormData();
+
+    // Pridanie všetkých potrebných polí z upload form
+    Object.entries(uploadTask.result.form.parameters).forEach(([key, value]) => {
+      formData.append(key, value as string);
+    });
+
+    // Konverzia base64 na blob a pridanie súboru
+    const binaryData = Buffer.from(base64Data, 'base64');
+    const blob = new Blob([binaryData]);
+    formData.append('file', blob, fileName);
+
+    const uploadResponse = await fetch(uploadTask.result.form.url, {
       method: 'POST',
-      headers: {
-        'x-api-key': apiKey,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        url: uploadResult.url, // Čistá URL bez dodatočných parametrov
-        name: fileName.replace(/\.(xlsx|xls|xlsm)$/i, '.pdf'),
-        async: false, // Synchronous processing
-        // Nastavenia pre lepší výstup
-        profiles: JSON.stringify(profileSettings),
-      }),
+      body: formData,
     });
 
-    const convertResult = await convertResponse.json();
-
-    if (!convertResult.url) {
-      throw new Error(convertResult.message || 'Chyba pri konverzii');
+    if (!uploadResponse.ok) {
+      throw new Error('Chyba pri nahrávaní súboru');
     }
 
-    // Krok 3: Stiahnutie PDF súboru
-    const pdfResponse = await fetch(convertResult.url);
-    
+    // Krok 3: Čakanie na dokončenie jobu (polling)
+    let jobCompleted = false;
+    let attempts = 0;
+    const maxAttempts = 60; // Max 60 sekúnd (60 x 1 sekunda)
+    let finalJobData;
+
+    while (!jobCompleted && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Čakanie 1 sekundu
+
+      const statusResponse = await fetch(`https://api.cloudconvert.com/v2/jobs/${jobData.data.id}`, {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+        },
+      });
+
+      if (!statusResponse.ok) {
+        throw new Error('Chyba pri kontrole stavu konverzie');
+      }
+
+      finalJobData = await statusResponse.json();
+      const status = finalJobData.data.status;
+
+      if (status === 'finished') {
+        jobCompleted = true;
+      } else if (status === 'error') {
+        throw new Error('Konverzia zlyhala');
+      }
+
+      attempts++;
+    }
+
+    if (!jobCompleted) {
+      throw new Error('Časový limit konverzie vypršal');
+    }
+
+    // Krok 4: Získanie URL exportovaného súboru
+    const exportTask = finalJobData.data.tasks.find((task: any) => task.name === 'export-my-file');
+
+    if (!exportTask || !exportTask.result?.files?.[0]?.url) {
+      throw new Error('Nepodarilo sa získať URL konvertovaného súboru');
+    }
+
+    const pdfUrl = exportTask.result.files[0].url;
+
+    // Krok 5: Stiahnutie PDF súboru
+    const pdfResponse = await fetch(pdfUrl);
+
     if (!pdfResponse.ok) {
       throw new Error('Chyba pri sťahovaní PDF');
     }
@@ -97,9 +153,9 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Chyba pri konverzii Excel na PDF:', error);
-    
+
     return NextResponse.json(
-      { 
+      {
         error: error instanceof Error ? error.message : 'Neznáma chyba pri konverzii',
       },
       { status: 500 }

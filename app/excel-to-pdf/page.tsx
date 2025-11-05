@@ -58,7 +58,7 @@ export default function ExcelToPdfPage() {
       const base64Data = await base64Promise;
       setProgress(40);
 
-      // Krok 2: Volanie PDF.co API
+      // Krok 2: Volanie CloudConvert API
       const response = await fetch('/api/excel-to-pdf', {
         method: 'POST',
         headers: {
@@ -223,8 +223,8 @@ export default function ExcelToPdfPage() {
           <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <h3 className="font-semibold text-blue-900 mb-2">ℹ️ Informácie</h3>
             <ul className="text-sm text-blue-700 space-y-1">
-              <li>• Konverzia prebieha bezpečne cez PDF.co API</li>
-              <li>• Zachováva formátovanie a štýly</li>
+              <li>• Konverzia prebieha bezpečne cez CloudConvert API</li>
+              <li>• Zachováva pôvodné formátovanie a štýly bez deformácie</li>
               <li>• Podporuje viacero listov (sheets)</li>
               <li>• Maximálna veľkosť: 50 MB</li>
             </ul>
