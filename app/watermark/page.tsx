@@ -62,7 +62,8 @@ export default function WatermarkPage() {
       });
 
       const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const pdfArrayBuffer = new Uint8Array(pdfBytes).buffer;
+      const blob = new Blob([pdfArrayBuffer], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       
       const link = document.createElement('a');

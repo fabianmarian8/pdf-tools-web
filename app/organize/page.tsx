@@ -2,14 +2,8 @@
 
 import { useState, useRef } from 'react';
 import { PDFDocument } from 'pdf-lib';
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
 import Link from 'next/link';
 import AnimatedBackground from '@/components/AnimatedBackground';
-
-// Nastavíme worker pre pdfjs
-if (typeof window !== 'undefined') {
-  GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
-}
 
 interface PagePreview {
   index: number;
@@ -24,6 +18,18 @@ export default function OrganizePage() {
   const [isGeneratingPreviews, setIsGeneratingPreviews] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pdfjsLibRef = useRef<typeof import('pdfjs-dist') | null>(null);
+
+  const loadPdfjs = async (): Promise<typeof import('pdfjs-dist')> => {
+    if (!pdfjsLibRef.current) {
+      const pdfjsLib = await import('pdfjs-dist');
+      if (typeof window !== 'undefined') {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+      }
+      pdfjsLibRef.current = pdfjsLib;
+    }
+    return pdfjsLibRef.current!;
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -34,7 +40,8 @@ export default function OrganizePage() {
     
     try {
       const arrayBuffer = await selectedFile.arrayBuffer();
-      const loadingTask = getDocument({ data: arrayBuffer });
+      const pdfjs = await loadPdfjs();
+      const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
       const pdfDoc = await loadingTask.promise;
       
       const pagePromises: Promise<PagePreview>[] = [];
@@ -55,6 +62,7 @@ export default function OrganizePage() {
             await page.render({
               canvasContext: context,
               viewport: viewport,
+              canvas,
             }).promise;
             
             return {
@@ -131,7 +139,8 @@ export default function OrganizePage() {
       }
 
       const pdfBytes = await newPdf.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const pdfArrayBuffer = new Uint8Array(pdfBytes).buffer;
+      const blob = new Blob([pdfArrayBuffer], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       
       const link = document.createElement('a');
